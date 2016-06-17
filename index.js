@@ -109,15 +109,24 @@ ${editor.getValue()}
   };
 
   editor.on('change', () => {
-    const code = editor.getValue();
-    const firstLine = code.split('\n')[0] || '';
+    const lines = editor.getValue().split('\n');
+
+    let candidateConfigLine = undefined;
+
+    for (let line of lines) {
+      if (line.trim() !== '' && line.trim() !== `'use strict';`) {
+        candidateConfigLine = line;
+        break;
+      }
+    }
+
     const prefix = '// readysetjs config: ';
 
     let config = {autoRun: false};
 
-    if (firstLine.substring(0, prefix.length) === prefix) {
+    if (candidateConfigLine.substring(0, prefix.length) === prefix) {
       try {
-        config = JSON.parse(firstLine.substring(prefix.length));
+        config = JSON.parse(candidateConfigLine.substring(prefix.length));
       } catch(e) {
         console.error(e);
       }
